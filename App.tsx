@@ -6,7 +6,7 @@ import {
   useFonts,
 } from '@expo-google-fonts/roboto'
 
-import { Center, GluestackUIProvider, Text } from '@gluestack-ui/themed'
+import { GluestackUIProvider } from '@gluestack-ui/themed'
 import { config } from './config/gluestack-ui.config'
 
 import { Loading } from '@components/Loading'
