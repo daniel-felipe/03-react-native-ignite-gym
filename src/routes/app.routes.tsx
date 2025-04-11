@@ -12,6 +12,7 @@ import { Exercise } from '@screens/Exercise'
 import { History } from '@screens/History'
 import { Home } from '@screens/Home'
 import { Profile } from '@screens/Profile'
+import { Platform } from 'react-native'
 
 type AppRoutes = {
   home: undefined
@@ -26,10 +27,25 @@ const { Navigator, Screen } = createBottomTabNavigator<AppRoutes>()
 
 export function AppRoutes() {
   const { tokens } = gluestackUIConfig
-  const iconSize = tokens.space['6']
+  const iconSize = tokens.space['8']
 
   return (
-    <Navigator screenOptions={{ headerShown: false, tabBarShowLabel: false }}>
+    <Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: tokens.colors.green500,
+        tabBarInactiveTintColor: tokens.colors.green200,
+        tabBarLabelPosition: 'beside-icon',
+        tabBarStyle: {
+          backgroundColor: tokens.colors.gray600,
+          borderTopWidth: 0,
+          height: Platform.OS === 'android' ? 'auto' : 96,
+          paddingBottom: tokens.space['10'],
+          paddingTop: tokens.space['7'],
+        },
+      }}
+    >
       <Screen
         name="home"
         component={Home}
@@ -60,7 +76,14 @@ export function AppRoutes() {
         }}
       />
 
-      <Screen name="exercise" component={Exercise} />
+      <Screen
+        name="exercise"
+        component={Exercise}
+        options={{
+          tabBarButton: () => null,
+          tabBarItemStyle: { display: 'none' },
+        }}
+      />
     </Navigator>
   )
 }
