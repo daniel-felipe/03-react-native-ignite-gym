@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { Group } from '@components/Group'
 import { HomeHeader } from '@components/HomeHeader'
 import { FlatList, Heading, HStack, Text, VStack } from '@gluestack-ui/themed'
+import { ExerciseCard } from '@components/ExerciseCard'
 
 export function Home() {
   const [groups, setGroups] = useState(['Costas', 'Bíceps', 'Tríceps', 'Ombro'])
@@ -36,6 +37,8 @@ export function Home() {
 
           <Text color="$gray200" fontSize="$sm" fontFamily="$body">4</Text>
         </HStack>
+
+        <ExerciseCard />
       </VStack>
     </VStack>
   )
