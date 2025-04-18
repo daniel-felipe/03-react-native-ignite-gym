@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import { FlatList } from 'react-native'
 
 import { ExerciseCard } from '@components/ExerciseCard'
 import { Group } from '@components/Group'
 import { HomeHeader } from '@components/HomeHeader'
-import { FlatList, HStack, Heading, Text, VStack } from '@gluestack-ui/themed'
+import { HStack, Heading, Text, VStack } from '@gluestack-ui/themed'
 
 export function Home() {
   const [exercises, setExercises] = useState([
