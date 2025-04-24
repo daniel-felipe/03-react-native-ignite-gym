@@ -6,15 +6,26 @@ import { Button } from '@components/Button'
 import { Input } from '@components/Input'
 import { ScreenHeader } from '@components/ScreenHeader'
 import { UserPhoto } from '@components/UserPhoto'
+import { useState } from 'react'
 
 export function Profile() {
+  const [userPhoto, setUserPhoto] = useState(
+    'https://github.com/daniel-felipe.png'
+  )
+
   async function handleUserPhotoSelect() {
-    await ImagePicker.launchImageLibraryAsync({
+    const photoSelected = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],
       quality: 1,
       aspect: [4, 4],
       allowsEditing: true,
     })
+
+    if (photoSelected.canceled) {
+      return
+    }
+
+    setUserPhoto(photoSelected.assets[0].uri)
   }
 
   return (
@@ -24,7 +35,7 @@ export function Profile() {
       <ScrollView contentContainerStyle={{ paddingBottom: 36 }}>
         <Center mt="$6" px="$10">
           <UserPhoto
-            source={{ uri: 'https://github.com/daniel-felipe.png' }}
+            source={{ uri: userPhoto }}
             alt="Foto do usuário"
             size="xl"
           />
