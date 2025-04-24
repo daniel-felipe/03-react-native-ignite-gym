@@ -1,6 +1,6 @@
-import { ScrollView, TouchableOpacity } from 'react-native'
-
 import { Center, Heading, Text, VStack } from '@gluestack-ui/themed'
+import * as ImagePicker from 'expo-image-picker'
+import { ScrollView, TouchableOpacity } from 'react-native'
 
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
@@ -8,6 +8,15 @@ import { ScreenHeader } from '@components/ScreenHeader'
 import { UserPhoto } from '@components/UserPhoto'
 
 export function Profile() {
+  async function handleUserPhotoSelect() {
+    await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 1,
+      aspect: [4, 4],
+      allowsEditing: true,
+    })
+  }
+
   return (
     <VStack flex={1}>
       <ScreenHeader title="Perfil" />
@@ -20,7 +29,7 @@ export function Profile() {
             size="xl"
           />
 
-          <TouchableOpacity>
+          <TouchableOpacity onPress={handleUserPhotoSelect}>
             <Text
               color="$green500"
               fontFamily="$heading"
