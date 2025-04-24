@@ -1,6 +1,7 @@
 import { Center, Heading, Text, VStack } from '@gluestack-ui/themed'
+import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
-import { ScrollView, TouchableOpacity } from 'react-native'
+import { Alert, ScrollView, TouchableOpacity } from 'react-native'
 
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
@@ -14,18 +15,37 @@ export function Profile() {
   )
 
   async function handleUserPhotoSelect() {
-    const photoSelected = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ['images'],
-      quality: 1,
-      aspect: [4, 4],
-      allowsEditing: true,
-    })
+    try {
+      const photoSelected = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        quality: 1,
+        aspect: [4, 4],
+        allowsEditing: true,
+      })
 
-    if (photoSelected.canceled) {
-      return
+      if (photoSelected.canceled) {
+        return
+      }
+
+      const photoURI = photoSelected.assets[0].uri
+
+      if (photoURI) {
+        const photoInfo = (await FileSystem.getInfoAsync(photoURI)) as {
+          size: number
+        }
+
+        const photoSizeInMB = photoInfo.size / 1024 / 1024
+        if (photoInfo.size && photoSizeInMB > 5) {
+          return Alert.alert(
+            'Essa imagem ẽ muito grande. Escolha uma de até 5MB'
+          )
+        }
+
+        setUserPhoto(photoSelected.assets[0].uri)
+      }
+    } catch (error) {
+      console.log(error)
     }
-
-    setUserPhoto(photoSelected.assets[0].uri)
   }
 
   return (
