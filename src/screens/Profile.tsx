@@ -1,11 +1,12 @@
-import { Center, Heading, Text, VStack } from '@gluestack-ui/themed'
+import { Center, Heading, Text, VStack, useToast } from '@gluestack-ui/themed'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
-import { Alert, ScrollView, TouchableOpacity } from 'react-native'
+import { ScrollView, TouchableOpacity } from 'react-native'
 
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
 import { ScreenHeader } from '@components/ScreenHeader'
+import { ToastMessage } from '@components/ToastMessage'
 import { UserPhoto } from '@components/UserPhoto'
 import { useState } from 'react'
 
@@ -13,6 +14,8 @@ export function Profile() {
   const [userPhoto, setUserPhoto] = useState(
     'https://github.com/daniel-felipe.png'
   )
+
+  const toast = useToast()
 
   async function handleUserPhotoSelect() {
     try {
@@ -36,9 +39,18 @@ export function Profile() {
 
         const photoSizeInMB = photoInfo.size / 1024 / 1024
         if (photoInfo.size && photoSizeInMB > 5) {
-          return Alert.alert(
-            'Essa imagem ẽ muito grande. Escolha uma de até 5MB'
-          )
+          return toast.show({
+            placement: 'top',
+            render: ({ id }) => (
+              <ToastMessage
+                id={id}
+                action="error"
+                title="Imagem muito grande!"
+                description="Essa imagem é muito grande. Escolha uma de até 5MB."
+                onClose={() => toast.close(id)}
+              />
+            ),
+          })
         }
 
         setUserPhoto(photoSelected.assets[0].uri)
