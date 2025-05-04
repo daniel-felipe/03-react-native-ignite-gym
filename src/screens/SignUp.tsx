@@ -82,17 +82,21 @@ export function SignUp() {
                   placeholder="Nome"
                   onChangeText={onChange}
                   value={value}
+                  errorMessage={errors.name?.message}
                 />
               )}
             />
 
-            {errors.name?.message && (
-              <Text color="$white">{errors.name.message}</Text>
-            )}
-
             <Controller
               control={control}
               name="email"
+              rules={{
+                required: 'Informe o e-mail',
+                pattern: {
+                  value: /^[A-Z0-9._%+-]+@[A-Z]{2,}\.[A-Z]+$/i,
+                  message: 'E-mail inválido',
+                },
+              }}
               render={({ field: { onChange, value } }) => (
                 <Input
                   placeholder="E-mail"
@@ -100,6 +104,7 @@ export function SignUp() {
                   autoCapitalize="none"
                   onChangeText={onChange}
                   value={value}
+                  errorMessage={errors.email?.message}
                 />
               )}
             />
