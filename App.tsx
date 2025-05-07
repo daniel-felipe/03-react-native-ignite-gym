@@ -11,6 +11,7 @@ import { config } from './config/gluestack-ui.config'
 
 import { Loading } from '@components/Loading'
 
+import { AuthContext } from '@contexts/AuthContext'
 import { Routes } from '@routes/index'
 
 export default function App() {
@@ -27,7 +28,16 @@ export default function App() {
         translucent
       />
 
-      {fontsLoaded ? <Routes /> : <Loading />}
+      <AuthContext.Provider
+        value={{
+          id: '1',
+          name: 'John Doe',
+          email: 'john@doe.com',
+          avatar: 'john-doe.png',
+        }}
+      >
+        {fontsLoaded ? <Routes /> : <Loading />}
+      </AuthContext.Provider>
     </GluestackUIProvider>
   )
 }
