@@ -6,6 +6,7 @@ import {
   Text,
   VStack,
 } from '@gluestack-ui/themed'
+import { Controller, useForm } from 'react-hook-form'
 
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
@@ -15,11 +16,26 @@ import { AuthNavigatorRoutesProps } from '@routes/auth.routes'
 import BackgroundImg from '@assets/background.png'
 import Logo from '@assets/logo.svg'
 
+type FormDataProps = {
+  email: string
+  password: string
+}
+
 export function SignIn() {
   const navigation = useNavigation<AuthNavigatorRoutesProps>()
 
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormDataProps>()
+
   function handleNewAccount() {
     navigation.navigate('signUp')
+  }
+
+  function handleSignIn(data: FormDataProps) {
+    console.log(data)
   }
 
   return (
@@ -47,14 +63,40 @@ export function SignIn() {
           <Center gap="$2">
             <Heading color="$gray100">Accesse a conta</Heading>
 
-            <Input
-              placeholder="E-mail"
-              keyboardType="email-address"
-              autoCapitalize="none"
+            <Controller
+              control={control}
+              name="email"
+              rules={{ required: 'Informe o email.', max: 255 }}
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="E-mail"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.email?.message}
+                />
+              )}
             />
-            <Input placeholder="Senha" secureTextEntry />
 
-            <Button title="Acessar" />
+            <Controller
+              control={control}
+              name="password"
+              rules={{ required: 'Informe a senha.', max: 255 }}
+              render={({ field: { onChange, value } }) => (
+                <Input
+                  placeholder="Senha"
+                  secureTextEntry
+                  onChangeText={onChange}
+                  value={value}
+                  errorMessage={errors.password?.message}
+                  onSubmitEditing={handleSubmit(handleSignIn)}
+                  returnKeyType="go"
+                />
+              )}
+            />
+
+            <Button title="Acessar" onPress={handleSubmit(handleSignIn)} />
           </Center>
 
           <Center flex={1} justifyContent="flex-end" mt="$4">
