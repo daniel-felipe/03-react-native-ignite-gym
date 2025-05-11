@@ -20,6 +20,7 @@ import { AppError } from '@utils/AppError'
 
 import BackgroundImg from '@assets/background.png'
 import Logo from '@assets/logo.svg'
+import { useState } from 'react'
 
 type FormDataProps = {
   email: string
@@ -27,6 +28,8 @@ type FormDataProps = {
 }
 
 export function SignIn() {
+  const [isLoading, setIsLoading] = useState(false)
+
   const { signIn } = useAuth()
   const navigation = useNavigation<AuthNavigatorRoutesProps>()
   const toast = useToast()
@@ -43,6 +46,8 @@ export function SignIn() {
 
   async function handleSignIn({ email, password }: FormDataProps) {
     try {
+      setIsLoading(true)
+
       await signIn(email, password)
     } catch (error) {
       const isAppError = error instanceof AppError
@@ -50,6 +55,8 @@ export function SignIn() {
       const title = isAppError
         ? error.message
         : 'Não foi possível entrar. Tente novamente mais tarde.'
+
+      setIsLoading(false)
 
       toast.show({
         placement: 'top',
@@ -120,7 +127,11 @@ export function SignIn() {
               )}
             />
 
-            <Button title="Acessar" onPress={handleSubmit(handleSignIn)} />
+            <Button
+              title="Acessar"
+              isLoading={isLoading}
+              onPress={handleSubmit(handleSignIn)}
+            />
           </Center>
 
           <Center flex={1} justifyContent="flex-end" mt="$4">
