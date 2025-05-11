@@ -4,13 +4,15 @@ import { LogOut } from 'lucide-react-native'
 import { useAuth } from '@hooks/useAuth'
 import { UserPhoto } from './UserPhoto'
 
+import defaultUserPhotoImg from '@assets/userPhotoDefault.png'
+
 export function HomeHeader() {
   const { user } = useAuth()
 
   return (
     <HStack bg="$gray600" pt="$16" pb="$5" px="$8" gap="$4" alignItems="center">
       <UserPhoto
-        source={{ uri: 'https://github.com/daniel-felipe.png' }}
+        source={user.avatar ? { uri: user.avatar } : defaultUserPhotoImg}
         w="$16"
         h="$16"
         alt="Imagem do usuário"
