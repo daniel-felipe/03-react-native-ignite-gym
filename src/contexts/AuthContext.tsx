@@ -2,6 +2,7 @@ import { ReactNode, createContext, useEffect, useState } from 'react'
 
 import { UserDTO } from '@dtos/UserDTO'
 import { api } from '@services/api'
+import { storageAuthTokenSave } from '@storage/storageAuthToken'
 import {
   storageUserGet,
   storageUserRemove,
@@ -27,12 +28,29 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
   const [user, setUser] = useState<UserDTO>({} as UserDTO)
   const [isLoadingUserStorageData, setIsLoadingUserStorageData] = useState(true)
 
+  async function storeUserAndToken(userData: UserDTO, token: string) {
+    try {
+      setIsLoadingUserStorageData(true)
+
+      api.defaults.headers.common.Authorization = `Bearer ${token}`
+
+      await storageUserSave(userData)
+      await storageAuthTokenSave(token)
+      setUser(userData)
+    } catch (error) {
+      console.error(error)  
+    } finally {
+      setIsLoadingUserStorageData(false)
+    }
+  }
+
   async function signIn(email: string, password: string) {
     const { data } = await api.post('/sessions', { email, password })
 
     if (data.user && data.token) {
-      setUser(data.user)
-      storageUserSave(data.user)
+      const { user, token } = data
+
+      storeUserAndToken(user, token)
     }
   }
 
@@ -63,6 +81,7 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <>
   useEffect(() => {
     loadUserData()
   }, [])
