@@ -1,20 +1,58 @@
+import { useCallback, useState } from 'react'
+
 import { HistoryCard } from '@components/HistoryCard'
 import { ScreenHeader } from '@components/ScreenHeader'
-import { Heading, Text, VStack } from '@gluestack-ui/themed'
-import { useState } from 'react'
+import {
+  Heading,
+  Text,
+  Toast,
+  ToastTitle,
+  VStack,
+  useToast,
+} from '@gluestack-ui/themed'
+import { useFocusEffect } from '@react-navigation/native'
 import { SectionList } from 'react-native'
 
+import { HistoryByDayDTO } from '@dtos/HistoryByDayDTO'
+import { api } from '@services/api'
+import { AppError } from '@utils/AppError'
+
 export function History() {
-  const [exercises, setExercises] = useState([
-    {
-      title: '22.07.2024',
-      data: ['Puxada frontal', 'Remada unilateral'],
-    },
-    {
-      title: '23.07.2024',
-      data: ['Puxada frontal'],
-    },
-  ])
+  const [isLoading, setIsLoading] = useState(true)
+  const [exercises, setExercises] = useState<HistoryByDayDTO[]>([])
+
+  const toast = useToast()
+
+  async function fetchHistory() {
+    try {
+      setIsLoading(true)
+
+      const { data } = await api.get('/history')
+      setExercises(data)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível carregar o histórico.'
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <Toast nativeID={id} variant="solid" bg="$red500">
+            <ToastTitle>{title}</ToastTitle>
+          </Toast>
+        ),
+      })
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchHistory()
+    }, [])
+  )
 
   return (
     <VStack flex={1}>
@@ -22,7 +60,7 @@ export function History() {
 
       <SectionList
         sections={exercises}
-        keyExtractor={(item) => item}
+        keyExtractor={(item) => item.id}
         renderItem={() => <HistoryCard />}
         renderSectionHeader={({ section }) => (
           <Heading
