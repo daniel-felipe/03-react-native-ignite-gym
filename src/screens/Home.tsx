@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/native'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { FlatList } from 'react-native'
 
 import { AppNavigatorRoutesProps } from '@routes/app.routes'
@@ -7,7 +7,17 @@ import { AppNavigatorRoutesProps } from '@routes/app.routes'
 import { ExerciseCard } from '@components/ExerciseCard'
 import { Group } from '@components/Group'
 import { HomeHeader } from '@components/HomeHeader'
-import { HStack, Heading, Text, VStack } from '@gluestack-ui/themed'
+import {
+  HStack,
+  Heading,
+  Text,
+  Toast,
+  ToastTitle,
+  VStack,
+  useToast,
+} from '@gluestack-ui/themed'
+import { api } from '@services/api'
+import { AppError } from '@utils/AppError'
 
 export function Home() {
   const [exercises, setExercises] = useState([
@@ -19,14 +29,41 @@ export function Home() {
     'Rosca barra',
     'Elevação lateral',
   ])
-  const [groups, setGroups] = useState(['Costas', 'Bíceps', 'Tríceps', 'Ombro'])
+  const [groups, setGroups] = useState<string[]>([])
   const [groupSelected, setGroupSelected] = useState('Costas')
 
+  const toast = useToast()
   const navigation = useNavigation<AppNavigatorRoutesProps>()
 
   function handleOpenExerciseDetails() {
     navigation.navigate('exercise')
   }
+
+  async function fetchGroups() {
+    try {
+      const response = await api.get('/groups')
+      setGroups(response.data)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível carregar os grupos musculares.'
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <Toast nativeID={id} variant="solid" bg="$red500">
+            <ToastTitle>{title}</ToastTitle>
+          </Toast>
+        ),
+      })
+    }
+  }
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  useEffect(() => {
+    fetchGroups()
+  }, [])
 
   return (
     <VStack flex={1}>
