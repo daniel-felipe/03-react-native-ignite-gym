@@ -1,5 +1,6 @@
-import { useNavigation } from '@react-navigation/native'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
+
+import { useFocusEffect, useNavigation } from '@react-navigation/native'
 import { FlatList } from 'react-native'
 
 import { AppNavigatorRoutesProps } from '@routes/app.routes'
@@ -7,6 +8,7 @@ import { AppNavigatorRoutesProps } from '@routes/app.routes'
 import { ExerciseCard } from '@components/ExerciseCard'
 import { Group } from '@components/Group'
 import { HomeHeader } from '@components/HomeHeader'
+import { ExerciseDTO } from '@dtos/Exercise'
 import {
   HStack,
   Heading,
@@ -20,15 +22,7 @@ import { api } from '@services/api'
 import { AppError } from '@utils/AppError'
 
 export function Home() {
-  const [exercises, setExercises] = useState([
-    'Puxada frontal',
-    'Remada furvada',
-    'Remada unilateral',
-    'Levantamento terra',
-    'Rosca polia',
-    'Rosca barra',
-    'Elevação lateral',
-  ])
+  const [exercises, setExercises] = useState<ExerciseDTO[]>([])
   const [groups, setGroups] = useState<string[]>([])
   const [groupSelected, setGroupSelected] = useState('Costas')
 
@@ -41,8 +35,8 @@ export function Home() {
 
   async function fetchGroups() {
     try {
-      const response = await api.get('/groups')
-      setGroups(response.data)
+      const { data } = await api.get('/groups')
+      setGroups(data)
     } catch (error) {
       const isAppError = error instanceof AppError
       const title = isAppError
@@ -60,10 +54,36 @@ export function Home() {
     }
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+  async function fetchExercisesByGroup() {
+    try {
+      const { data } = await api.get(`/exercises/bygroup/${groupSelected}`)
+      setExercises(data)
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível carregar os exercícios.'
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <Toast nativeID={id} variant="solid" bg="$red500">
+            <ToastTitle>{title}</ToastTitle>
+          </Toast>
+        ),
+      })
+    }
+  }
+
   useEffect(() => {
     fetchGroups()
   }, [])
+
+  useFocusEffect(
+    useCallback(() => {
+      fetchExercisesByGroup()
+    }, [groupSelected])
+  )
 
   return (
     <VStack flex={1}>
@@ -98,7 +118,7 @@ export function Home() {
 
         <FlatList
           data={exercises}
-          keyExtractor={(item) => item}
+          keyExtractor={(item) => item.id}
           renderItem={() => (
             <ExerciseCard onPress={handleOpenExerciseDetails} />
           )}

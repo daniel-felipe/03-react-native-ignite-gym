@@ -25,11 +25,14 @@
         "useImportType": "off"
       },
       "correctness": {
-        "noUnusedImports": "error"
+        "noUnusedImports": "error",
+        "useExhaustiveDependencies": "off"
       }
     }
   },
   "files": {
-    "ignore": ["node_modules"]
+    "ignore": [
+      "node_modules"
+    ]
   }
 }
