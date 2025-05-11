@@ -56,7 +56,7 @@ export function Profile() {
         setUserPhoto(photoSelected.assets[0].uri)
       }
     } catch (error) {
-      console.log(error)
+      console.error(error)
     }
   }
 
