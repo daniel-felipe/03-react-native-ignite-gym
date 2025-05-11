@@ -8,7 +8,7 @@ import { AppNavigatorRoutesProps } from '@routes/app.routes'
 import { ExerciseCard } from '@components/ExerciseCard'
 import { Group } from '@components/Group'
 import { HomeHeader } from '@components/HomeHeader'
-import { ExerciseDTO } from '@dtos/Exercise'
+import { ExerciseDTO } from '@dtos/ExerciseDTO'
 import {
   HStack,
   Heading,
@@ -119,8 +119,8 @@ export function Home() {
         <FlatList
           data={exercises}
           keyExtractor={(item) => item.id}
-          renderItem={() => (
-            <ExerciseCard onPress={handleOpenExerciseDetails} />
+          renderItem={({ item }) => (
+            <ExerciseCard data={item} onPress={handleOpenExerciseDetails} />
           )}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={{ paddingBottom: 20 }}
