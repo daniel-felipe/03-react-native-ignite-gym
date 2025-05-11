@@ -27,7 +27,7 @@ export function Home() {
 
   const [exercises, setExercises] = useState<ExerciseDTO[]>([])
   const [groups, setGroups] = useState<string[]>([])
-  const [groupSelected, setGroupSelected] = useState('Antebraço')
+  const [groupSelected, setGroupSelected] = useState('antebraço')
 
   const toast = useToast()
   const navigation = useNavigation<AppNavigatorRoutesProps>()
@@ -89,7 +89,7 @@ export function Home() {
   useFocusEffect(
     useCallback(() => {
       fetchExercisesByGroup()
-    }, [groupSelected, groups])
+    }, [groupSelected])
   )
 
   return (

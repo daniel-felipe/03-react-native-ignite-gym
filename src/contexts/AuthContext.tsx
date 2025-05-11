@@ -98,7 +98,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
     }
   }
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <>
   useEffect(() => {
     loadUserData()
   }, [])
