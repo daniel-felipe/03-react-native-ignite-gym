@@ -66,6 +66,8 @@ export function SignIn() {
           </Toast>
         ),
       })
+    } finally {
+      setIsLoading(false)
     }
   }
 
