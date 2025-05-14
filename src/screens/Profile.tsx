@@ -67,7 +67,7 @@ export function Profile() {
   )
 
   const toast = useToast()
-  const { user } = useAuth()
+  const { user, updateUserProfile } = useAuth()
   const {
     control,
     handleSubmit,
@@ -127,7 +127,12 @@ export function Profile() {
     try {
       setIsUpdating(true)
 
+      const userUpdated = user;
+      userUpdated.name = data.name
+
       api.put('/users', data)
+
+      await updateUserProfile(userUpdated)
 
       toast.show({
         placement: 'top',
