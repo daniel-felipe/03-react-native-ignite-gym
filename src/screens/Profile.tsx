@@ -3,12 +3,22 @@ import { ScrollView, TouchableOpacity } from 'react-native'
 
 import { Controller, useForm } from 'react-hook-form'
 
-import { Center, Heading, Text, VStack, useToast } from '@gluestack-ui/themed'
+import {
+  Center,
+  Heading,
+  Text,
+  Toast,
+  ToastTitle,
+  VStack,
+  useToast,
+} from '@gluestack-ui/themed'
 
 import { yupResolver } from '@hookform/resolvers/yup'
 import * as FileSystem from 'expo-file-system'
 import * as ImagePicker from 'expo-image-picker'
 import * as yup from 'yup'
+
+import { api } from '@services/api'
 
 import { Button } from '@components/Button'
 import { Input } from '@components/Input'
@@ -17,6 +27,7 @@ import { ToastMessage } from '@components/ToastMessage'
 import { UserPhoto } from '@components/UserPhoto'
 
 import { useAuth } from '@hooks/useAuth'
+import { AppError } from '@utils/AppError'
 
 type FormDataProps = {
   name: string
@@ -45,11 +56,12 @@ const profileSchema = yup.object({
         schema
           .nullable()
           .required('Informe a confirmação da senha.')
-          .transform((value) => (!!value ? value : null)),
+          .transform((value) => (value ? value : null)),
     }),
 })
 
 export function Profile() {
+  const [isUpdating, setIsUpdating] = useState(false)
   const [userPhoto, setUserPhoto] = useState(
     'https://github.com/daniel-felipe.png'
   )
@@ -112,7 +124,36 @@ export function Profile() {
   }
 
   async function handleProfileUpdate(data: FormDataProps) {
-    console.log(data)
+    try {
+      setIsUpdating(true)
+
+      api.put('/users', data)
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <Toast nativeID={id} variant="solid" bg="$green500">
+            <ToastTitle>Perfil atualizado com sucesso!</ToastTitle>
+          </Toast>
+        ),
+      })
+    } catch (error) {
+      const isAppError = error instanceof AppError
+      const title = isAppError
+        ? error.message
+        : 'Não foi possível atualizar os dados. Tente novamente mais tarde.'
+
+      toast.show({
+        placement: 'top',
+        render: ({ id }) => (
+          <Toast nativeID={id} variant="solid" bg="$red500">
+            <ToastTitle>{title}</ToastTitle>
+          </Toast>
+        ),
+      })
+    } finally {
+      setIsUpdating(false)
+    }
   }
 
   return (
@@ -224,6 +265,7 @@ export function Profile() {
             <Button
               title="Atualizar"
               onPress={handleSubmit(handleProfileUpdate)}
+              isLoading={isUpdating}
             />
           </Center>
         </Center>
