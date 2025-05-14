@@ -47,7 +47,7 @@ const profileSchema = yup.object({
   confirm_password: yup
     .string()
     .nullable()
-    .transform((value) => (value ? value : null))
+    .transform((value) => (!!value ? value : null))
     .oneOf([yup.ref('password'), null], 'A confirmação de senha não confere.')
     .when('password', {
       is: (field) => !!field,
@@ -126,11 +126,12 @@ export function Profile() {
   async function handleProfileUpdate(data: FormDataProps) {
     try {
       setIsUpdating(true)
+      console.log(data)
 
-      const userUpdated = user;
+      const userUpdated = user
       userUpdated.name = data.name
 
-      api.put('/users', data)
+      await api.put('/users', data)
 
       await updateUserProfile(userUpdated)
 
