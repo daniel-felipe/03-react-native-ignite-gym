@@ -41,7 +41,11 @@ const profileSchema = yup.object({
     .when('password', {
       is: (field) => !!field,
       // biome-ignore lint/suspicious/noThenProperty: <explanation>
-      then: (schema) => schema.nullable().required('Informe a confirmação da senha.'),
+      then: (schema) =>
+        schema
+          .nullable()
+          .required('Informe a confirmação da senha.')
+          .transform((value) => (!!value ? value : null)),
     }),
 })
 
