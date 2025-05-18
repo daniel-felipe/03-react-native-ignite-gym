@@ -1,6 +1,9 @@
 import axios, { AxiosError, AxiosInstance } from 'axios'
 
-import { storageAuthTokenGet } from '@storage/storageAuthToken'
+import {
+  storageAuthTokenGet,
+  storageAuthTokenSave,
+} from '@storage/storageAuthToken'
 import { AppError } from '@utils/AppError'
 
 type SignOut = () => void
@@ -14,7 +17,7 @@ type APIInstanceProps = AxiosInstance & {
   registerInterceptTokenManager: (signOut: SignOut) => () => void
 }
 
-export const api = axios.create({
+const api = axios.create({
   baseURL: 'http://192.168.18.11:3333',
 }) as APIInstanceProps
 
@@ -60,6 +63,52 @@ api.registerInterceptTokenManager = (signOut) => {
         }
 
         isRefreshing = true
+
+        return new Promise((resolve, reject) => {
+          try {
+            const getData = async () => {
+              const { data } = await api.post('/sessions/refresh-token', {
+                refresh_token,
+              })
+
+              storageAuthTokenSave({
+                token: data.token,
+                refresh_token: data.refresh_token,
+              })
+
+              if (originalRequestConfig.data) {
+                originalRequestConfig.data = JSON.parse(
+                  originalRequestConfig.data
+                )
+              }
+
+              originalRequestConfig.headers = {
+                Authorization: `Bearer ${data.token}`,
+              }
+              api.defaults.headers.common.Authorization = `Bearer ${data.token}`
+
+              failedQueued.forEach((request) => {
+                request.onSuccess(data.token)
+              })
+
+              console.log('HISTORICO ATUALIZADO')
+
+              resolve(api(originalRequestConfig))
+            }
+
+            getData()
+          } catch (error: any) {
+            failedQueued.forEach((request) => {
+              request.onFailure(error)
+            })
+
+            signOut()
+            reject(error)
+          } finally {
+            isRefreshing = false
+            failedQueued = []
+          }
+        })
       }
 
       if (requestError.response?.data) {
@@ -75,13 +124,4 @@ api.registerInterceptTokenManager = (signOut) => {
   }
 }
 
-api.interceptors.response.use(
-  (response) => response,
-  (error) => {
-    if (error.response?.data) {
-      return Promise.reject(new AppError(error.response.data.message))
-    }
-
-    return Promise.reject(error)
-  }
-)
+export { api }
