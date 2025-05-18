@@ -48,8 +48,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
 
       await storageUserSave(userData)
       await storageAuthTokenSave({ token, refresh_token })
-    } catch (error) {
-      console.error(error)
     } finally {
       setIsLoadingUserStorageData(false)
     }
@@ -65,8 +63,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
         await saveUserAndTokenOnStorage(user, token, refresh_token)
         updateUserAndToken(user, token)
       }
-    } catch (error) {
-      console.error(error)
     } finally {
       setIsLoadingUserStorageData(false)
     }
@@ -79,8 +75,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       setUser({} as UserDTO)
       await storageUserRemove()
       await storageAuthTokenRemove()
-    } catch (error) {
-      console.error(error)
     } finally {
       setIsLoadingUserStorageData(false)
     }
@@ -101,8 +95,6 @@ export function AuthContextProvider({ children }: AuthContextProviderProps) {
       if (token && loggedUser) {
         updateUserAndToken(loggedUser, token)
       }
-    } catch (error) {
-      console.error(error)
     } finally {
       setIsLoadingUserStorageData(false)
     }

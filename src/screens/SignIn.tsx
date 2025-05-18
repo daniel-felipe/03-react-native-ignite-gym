@@ -56,12 +56,14 @@ export function SignIn() {
         ? error.message
         : 'Não foi possível entrar. Tente novamente mais tarde.'
 
+      console.log(title)
+
       setIsLoading(false)
 
       toast.show({
         placement: 'top',
         render: ({ id }) => (
-          <Toast nativeID={id} variant="solid" bg="$red500">
+          <Toast nativeID={id} variant="solid" bg="$red500" mt="$12">
             <ToastTitle>{title}</ToastTitle>
           </Toast>
         ),

@@ -158,7 +158,6 @@ export function Profile() {
   async function handleProfileUpdate(data: FormDataProps) {
     try {
       setIsUpdating(true)
-      console.log(data)
 
       const userUpdated = user
       userUpdated.name = data.name
